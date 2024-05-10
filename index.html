@@ -1,0 +1,148 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./filter.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <title>filter</title>
+  </head> 
+  <body>
+    <div class="container">
+      <div class="leftMenu">
+        <input type="text" placeholder="Search..." class="search" />
+        <h1>Categories</h1>
+        <div class="cats">
+        </div>
+        <h1>Maximum Price</h1>
+        <div class="price">
+          <input type="range" class="priceRange" />
+          <span class="priceValue"></span>
+        </div>
+      </div>
+      <div class="content">
+        <div class="products">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<script>
+const data = [
+    {
+      id: 1,
+      name: "lorem",
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/800px-A_small_cup_of_coffee.JPG",
+      price: 9999999,
+      cat: "Coffee",
+    },
+    {
+      id: 2,
+      name: "lorem",
+      img: "https://www.nescafe.com/th/sites/default/files/2023-08/Nes_Web3_Article_Header_RichHistory_1448x1240.png",
+      price: 740,
+      cat: "Coffee",
+    },
+    {
+      id: 3,
+      name: "lorem",
+      img: "https://www.allrecipes.com/thmb/NFy4q5C38-ivZnk4nXGuiWgqUEc=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Why-Does-Tea-Make-You-Nauseated-4x3-11186feb90ad4a04a7516121d955947a.png ",
+      price: 2450,
+      cat: "Tea",
+    },
+    {
+      id: 4,
+      name: "lorem",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaz0CF00Gt-MeCs5w7_Er1NgkbZAFBJ4-x8NFX-NAhDQ&s",
+      price: 3200,
+      cat: "Cocoa",
+    },
+  ];
+  
+  const productsContainer = document.querySelector(".products");
+  const searchInput = document.querySelector(".search");
+  const categoriesContainer = document.querySelector(".cats");
+  const priceRange = document.querySelector(".priceRange");
+  const priceValue = document.querySelector(".priceValue");
+  
+  const displayProducts = (filteredProducts) => {
+    productsContainer.innerHTML = filteredProducts
+      .map(
+        (product) =>
+          `
+         <div class="product">
+            <img
+            src=${product.img}
+            alt=""
+            />
+            <span class="name">${product.name}</span>
+            <span class="priceText">$${product.price}</span>
+          </div>
+      `
+      )
+      .join("");
+  };
+  
+  displayProducts(data);
+  
+  searchInput.addEventListener("keyup", (e) => {
+    const value = e.target.value.toLowerCase();
+  
+    if (value) {
+      displayProducts(
+        data.filter((item) => item.name.toLowerCase().indexOf(value) !== -1)
+      );
+    } else {
+      displayProducts(data);
+    }
+  });
+  
+  const setCategories = () => {
+    const allCats = data.map((item) => item.cat);
+    const categories = [
+      "All",
+      ...allCats.filter((item, i) => {
+        return allCats.indexOf(item) === i;
+      }),
+    ];
+  
+    categoriesContainer.innerHTML = categories
+      .map(
+        (cat) =>
+          `
+        <span class="cat">${cat}</span>
+      `
+      )
+      .join("");
+  
+    categoriesContainer.addEventListener("click", (e) => {
+      const selectedCat = e.target.textContent;
+  
+      selectedCat === "All"
+        ? displayProducts(data)
+        : displayProducts(data.filter((item) => item.cat === selectedCat));
+    });
+  };
+  
+  const setPrices = () => {
+    const priceList = data.map((item) => item.price);
+    const minPrice = Math.min(...priceList);
+    const maxPrice = Math.max(...priceList);
+  
+    priceRange.min = minPrice;
+    priceRange.max = maxPrice;
+    priceRange.value = maxPrice;
+    priceValue.textContent = "$" + maxPrice;
+  
+    priceRange.addEventListener("input", (e) => {
+      priceValue.textContent = "$" + e.target.value;
+      displayProducts(data.filter((item) => item.price <= e.target.value));
+    });
+  };
+  
+  setCategories();
+  setPrices();
+</script>
